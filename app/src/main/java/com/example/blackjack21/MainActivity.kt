@@ -52,7 +52,7 @@ class MainActivity : AppCompatActivity() {
 
         floatingActionButton2.setOnClickListener {
 
-            textViewDealerScore.visibility = View.VISIBLE
+
             textViewAppname.visibility = View.GONE
             floatingActionButton2.text = "Hit"
 
@@ -69,9 +69,9 @@ class MainActivity : AppCompatActivity() {
             images.removeAt(dealerIndices1)
             images.removeAt(dealerIndices1)
             ////////////////////////
-            val dealer1 = DeckModel(dealerValue1)
-            val dealerheadenValue = DeckModel(dealerValue2)
-            val dealer2 = DeckModel(R.drawable.red_back)
+            val dealer1 = DeckModel(dealerValue1,"")
+            val dealerheadenValue = DeckModel(dealerValue2,"")
+            val dealer2 = DeckModel(R.drawable.red_back,"")
 
             //set images
             val dealerFirstBet: List<DeckModel> = listOf(
@@ -88,8 +88,8 @@ class MainActivity : AppCompatActivity() {
 
 
             ////////////////////////
-            val playerOne_1 = DeckModel(player1Value1)
-            val playerOne_2 = DeckModel(player1Value2)
+            val playerOne_1 = DeckModel(player1Value1,"")
+            val playerOne_2 = DeckModel(player1Value2,"")
             //remove card from list
             images.removeAt(player1Indices1)
             images.removeAt(player1Indices2)
@@ -117,21 +117,25 @@ class MainActivity : AppCompatActivity() {
                 var playerOneFirstBet1: List<DeckModel> = mutableListOf()
                 var dealerOneFirstBet1: List<DeckModel> = mutableListOf()
                 var index = 0
+                Log.d("Test", "onCreate: $players")
 
                 for (playerValue in players) {
 
                     if (index == 0) {
                         val values = players[index].cardValueOne
                         val values1 = players[index].cardValueTwo
+                        val values2 = players[index].cardValueThree
 
-                        val dealerOne_1 = DeckModel(values)
-                        val dealerOne_2 = DeckModel(dealer2.card)//manually hide second card
-                        var dealerOne_3 = DeckModel(values1)
+                        val DealerScore = computeScore(values, values1, values2)
+                        val dealerOne_1 = DeckModel(values, "Score $DealerScore")
+
+                        val dealerOne_2 = DeckModel(dealer2.card, "")//manually hide second card
+                        var dealerOne_3 = DeckModel(values1, "")
                         dealerOneFirstBet1 = mutableListOf(
                             dealerOne_1, dealerOne_2
                         )
 
-                        val DealerScore = computeScore(values, values1)
+
                         Log.d("Test", "DealerScore: $DealerScore")
 
                         index++
@@ -144,15 +148,15 @@ class MainActivity : AppCompatActivity() {
                         val values4 = players[index].cardValueFive
                         val values5 = players[index].cardValueSix
 
-                        val PlayerScore = computeScore(values, values1)
-                        Log.d("Test", "PlayScore: $PlayerScore")
+                        val PlayerScore = computeScore(values, values1, values2)
+                        Log.d("Test", "value 3: $values2")
 
-                        val playerOne = DeckModel(values)
-                        val playerTwo = DeckModel(values1)
-                        val playerThree = DeckModel(values2)
-                        val playerFour = DeckModel(values3)
-                        val playerFive = DeckModel(values4)
-                        val playerSix = DeckModel(values5)
+                        val playerOne = DeckModel(values, "Score $PlayerScore")
+                        val playerTwo = DeckModel(values1, "")
+                        val playerThree = DeckModel(values2, "")
+                        val playerFour = DeckModel(values3, "")
+                        val playerFive = DeckModel(values4, "")
+                        val playerSix = DeckModel(values5, "")
                         playerOneFirstBet1 = mutableListOf(
                             playerOne, playerTwo, playerThree, playerFour, playerFive, playerSix
                         )
@@ -170,7 +174,7 @@ class MainActivity : AppCompatActivity() {
             })
 
             //---------------------------
-            textViewDealerScore.text = ("$dealerScore")
+           
 
             if (isClicked == 0) {
 
@@ -189,7 +193,8 @@ class MainActivity : AppCompatActivity() {
                 player1Indices1 = (images.indices).random()
                 player1Value1 = images[player1Indices1]
 
-                playerViewModel.updateByPlayerNameFour(player1Value1, "Thulani")
+                playerViewModel.updateByPlayerName(player1Value1, "Thulani")
+
                 parent_rv.adapter?.notifyDataSetChanged()
                 isClicked++
             } else if (isClicked == 2) {
@@ -197,7 +202,7 @@ class MainActivity : AppCompatActivity() {
                 player1Indices1 = (images.indices).random()
                 player1Value1 = images[player1Indices1]
 
-                playerViewModel.updateByPlayerNameFive(player1Value1, "Thulani")
+                playerViewModel.updateByPlayerNameFour(player1Value1, "Thulani")
                 parent_rv.adapter?.notifyDataSetChanged()
                 isClicked++
             } else if (isClicked == 3) {
@@ -205,7 +210,7 @@ class MainActivity : AppCompatActivity() {
                 player1Indices1 = (images.indices).random()
                 player1Value1 = images[player1Indices1]
 
-                playerViewModel.updateByPlayerNameSix(player1Value1, "Thulani")
+                playerViewModel.updateByPlayerNameFive(player1Value1, "Thulani")
                 parent_rv.adapter?.notifyDataSetChanged()
                 isClicked++
             }
@@ -213,20 +218,32 @@ class MainActivity : AppCompatActivity() {
         }
 
     }
-private fun computeScore(firstValue:Int ,secondValue:Int):Int{
+private fun computeScore(firstValue:Int ,secondValue:Int ,thirdValue:Int  ):Int{
 
     //-------------------convert values to actual and do calculations
 
     val cardName = resources.getResourceName(firstValue)
         .replace("com.example.blackjack21:drawable/", "")
+
     val cardName2 = resources.getResourceName(secondValue)
         .replace("com.example.blackjack21:drawable/", "")
+    var cardName3:String =""
+    var selectedCardValue3=0
+
+    if(thirdValue !=0) {
+       cardName3= resources.getResourceName(thirdValue)
+            .replace("com.example.blackjack21:drawable/", "")
+        selectedCardValue3= getCardValue(cardName3)
+    }
+
+
     val selectedCardValue2 = getCardValue(cardName)
     val selectedCardValue = getCardValue(cardName2)
+
     //dealerScore = selectedCardValue + selectedCardValue2
     var  playerScore =0
     //-----Winner Algorithm
-    if (selectedCardValue2 == 0 || selectedCardValue == 0) {
+    if (selectedCardValue2 == -1 || selectedCardValue == -1) {
         Log.d("Test", "Ace Detected")
         if (selectedCardValue2 > selectedCardValue) {
             playerScore = selectedCardValue2 + 11
@@ -242,13 +259,36 @@ private fun computeScore(firstValue:Int ,secondValue:Int):Int{
     } else {
         playerScore = selectedCardValue + selectedCardValue2
         if (( playerScore ) < 21) {
-            //Log.d("Test", "save score  to db")
+            Log.d("Test", "save score  to db")
         } else {
-            playerScore = 0
+
             //Dealer Lost delete data
 
         }
     }
+    //------------------------------Third Value
+    //-----Winner Algorithm
+    if (selectedCardValue3 !=0){
+    if (selectedCardValue3 == -1) {
+        Log.d("Test", "first twocards $playerScore")
+            //playerScore += 11
+            if ( (playerScore + 11)  > 21) {
+                playerScore +=  + 1
+            }
+        else{
+                playerScore += 11
+        }
+
+    } else {
+        playerScore = selectedCardValue3 + playerScore
+        if (( playerScore ) < 21) {
+            //Log.d("Test", "save score  to db")
+        } else {
+            //playerScore = 12121212
+            //Dealer Lost delete data
+
+        }
+    }}
     Log.d("Test", " $cardName2 $cardName  valu1 =$selectedCardValue2 value =$selectedCardValue Score= $playerScore ")
 
     return playerScore
@@ -290,7 +330,7 @@ private fun computeScore(firstValue:Int ,secondValue:Int):Int{
         resourceName.contains("qc") || resourceName.contains("qh")
                 || resourceName.contains("qs") || resourceName.contains("qd") -> 10
         else ->
-            0
+            -1
     }
 
     private fun loadCard(): MutableList<Int> {

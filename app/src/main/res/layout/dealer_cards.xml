@@ -11,4 +11,15 @@
         android:contentDescription="@null"
         android:layout_height="120dp"
         android:layout_width="80dp" />
+    <TextView
+        android:id="@+id/textViewDealerScore"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-black"
+        android:text=""
+        android:textColor="@color/cardview_light_background"
+        android:textSize="24sp"
+
+      />
+
 </LinearLayout>

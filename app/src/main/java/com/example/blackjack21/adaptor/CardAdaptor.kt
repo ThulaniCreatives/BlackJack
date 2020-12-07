@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.blackjack21.R
@@ -23,9 +24,11 @@ class CardAdaptor  (val context: Context, private val items: List<DeckModel>) :
     class MainViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
        var cardImage :ImageView
+       var score :TextView
 
        init {
            cardImage = itemView.findViewById(R.id.card_icon) //change it
+           score = itemView.findViewById(R.id.textViewDealerScore)
        }
 
 
@@ -34,6 +37,9 @@ class CardAdaptor  (val context: Context, private val items: List<DeckModel>) :
     override fun onBindViewHolder(holder: CardAdaptor.MainViewHolder, position: Int) {
 
       holder.cardImage.setBackgroundResource(items[position].card)
+        if (position == 0) {
+            holder.score.setText(items[0].score)
+        }
 
 
     }

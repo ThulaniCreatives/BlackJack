@@ -1,4 +1,4 @@
 package com.example.blackjack21.model
 
-data class DeckModel(val card:Int)
+data class DeckModel(val card:Int, val score:String)
 
