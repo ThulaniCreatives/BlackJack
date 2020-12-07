@@ -25,6 +25,9 @@ import kotlinx.android.synthetic.main.custom_toast.*
 import kotlinx.android.synthetic.main.parent_recycler_view.*
 import kotlinx.android.synthetic.main.parent_recycler_view.floatingActionButton2
 import kotlinx.android.synthetic.main.players_row.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.util.zip.Inflater
 import kotlin.random.Random
 
@@ -48,7 +51,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.parent_recycler_view)
 
         //custom layout
-        val layout_custom = layoutInflater.inflate(R.layout.custom_toast , custom_toast_id)
+        val layout_custom_bust= layoutInflater.inflate(R.layout.custom_toast , custom_toast_id)
+        val layout_custom_blackjack = layoutInflater.inflate(R.layout.custom_toast_blackjack , custom_toast_id)
 
         playerViewModel = ViewModelProvider(this).get(PlayerViewModel::class.java)
         playerViewModel.deletePlayer()
@@ -119,8 +123,10 @@ class MainActivity : AppCompatActivity() {
             //--------------------- Get Players
 
             var allList: List<AllPlayers> = mutableListOf()
-            playerViewModel.getPlayer().observe(this, Observer<List<Player>> { players ->
+            var PlayerScore=0
+            var DealerScore =0
 
+            playerViewModel.getPlayer().observe(this, Observer<List<Player>> { players ->
                 var playerOneFirstBet1: List<DeckModel> = mutableListOf()
                 var dealerOneFirstBet1: List<DeckModel> = mutableListOf()
                 var index = 0
@@ -133,7 +139,7 @@ class MainActivity : AppCompatActivity() {
                         val values1 = players[index].cardValueTwo
                         val values2 = players[index].cardValueThree
 
-                        val DealerScore = computeScore(values, values1, values2)
+                        DealerScore = computeScore(values, values1, values2)
                         val dealerOne_1 = DeckModel(values, "Score $DealerScore")
 
                         val dealerOne_2 = DeckModel(dealer2.card, "")//manually hide second card
@@ -155,7 +161,8 @@ class MainActivity : AppCompatActivity() {
                         val values4 = players[index].cardValueFive
                         val values5 = players[index].cardValueSix
 
-                        val PlayerScore = computeScore(values, values1, values2)
+
+                        PlayerScore = computeScore(values, values1, values2)
                         Log.d("Test", "value 3: $values2")
 
 
@@ -168,36 +175,48 @@ class MainActivity : AppCompatActivity() {
                         playerOneFirstBet1 = mutableListOf(
                             playerOne, playerTwo, playerThree, playerFour, playerFive, playerSix
                         )
-
-                        if(PlayerScore >21){
-
-
-                            //refresh activity
-                            finish()
-                            Toast(this).apply {
-                                setGravity(Gravity.FILL_HORIZONTAL ,10,10)
-                                duration= Toast.LENGTH_LONG
-                                view = layout_custom
-                            }.show()
-                            overridePendingTransition(0,0)
-                            startActivity(intent)
-                            overridePendingTransition(0,0)
-                             //this.recreate()
-
-                        }
                     }
-
-
                     allList = mutableListOf(
                         AllPlayers(dealerOneFirstBet1), AllPlayers(playerOneFirstBet1)
-
                     )
-
                     setPlayers(allList)
                 }
 
-            })
+                //Conditions
+                Log.d("Test", "PlayerScore 1212122: $PlayerScore")
+                if(PlayerScore >21){
+                    Toast(this).apply {
+                        setGravity(Gravity.FILL_HORIZONTAL ,0,0)
+                        duration= Toast.LENGTH_LONG
+                        view = layout_custom_bust
 
+                    }.show()
+                    reloadActivity()
+                }
+
+                if(PlayerScore == 21){
+                    Toast(this).apply {
+                        setGravity(Gravity.FILL_HORIZONTAL ,0,0)
+                        duration= Toast.LENGTH_LONG
+                        view = layout_custom_blackjack
+
+                    }.show()
+                    reloadActivity()
+
+                }
+                if( DealerScore== 21){
+                    Toast(this).apply {
+                        setGravity(Gravity.FILL_HORIZONTAL ,0,0)
+                        duration= Toast.LENGTH_LONG
+                        view = layout_custom_blackjack
+
+                    }.show()
+                    reloadActivity()
+
+                }
+
+
+            })
             //---------------------------
            
 
@@ -245,6 +264,21 @@ class MainActivity : AppCompatActivity() {
         }
 
     }
+private fun reloadActivity(){
+    playerViewModel.deletePlayer()
+    //parent_rv.adapter?.notifyItemRangeRemoved(0,1)
+    parent_rv.adapter?.notifyDataSetChanged()
+    //Delay
+    GlobalScope.launch (context = Dispatchers.Default){
+
+        Thread.sleep(5000)
+        finish()
+        overridePendingTransition(0,0)
+        startActivity(intent)
+        overridePendingTransition(0, 0);
+        textViewAppname.visibility = View.GONE
+    }
+}
 private fun computeScore(firstValue:Int ,secondValue:Int ,thirdValue:Int  ):Int{
 
     //-------------------convert values to actual and do calculations

@@ -5,9 +5,9 @@
     android:orientation="horizontal"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:id="@+id/custom_toast_id"
+    android:id="@+id/custom_toast_blackjack"
     android:gravity="top"
-    android:background="@drawable/round_corners"
+    android:background="@drawable/round_corners_blackjack"
     android:padding="10dp">
 
     <TextView
