@@ -1,8 +1,11 @@
 package com.example.blackjack21
 
+import android.content.Intent
 import android.graphics.Rect
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -18,9 +21,11 @@ import com.example.blackjack21.model.AllPlayers
 import com.example.blackjack21.model.DeckModel
 import com.example.blackjack21.repository.PlayerViewModel
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.custom_toast.*
 import kotlinx.android.synthetic.main.parent_recycler_view.*
 import kotlinx.android.synthetic.main.parent_recycler_view.floatingActionButton2
 import kotlinx.android.synthetic.main.players_row.*
+import java.util.zip.Inflater
 import kotlin.random.Random
 
 class MainActivity : AppCompatActivity() {
@@ -42,6 +47,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.parent_recycler_view)
 
+        //custom layout
+        val layout_custom = layoutInflater.inflate(R.layout.custom_toast , custom_toast_id)
 
         playerViewModel = ViewModelProvider(this).get(PlayerViewModel::class.java)
         playerViewModel.deletePlayer()
@@ -151,6 +158,7 @@ class MainActivity : AppCompatActivity() {
                         val PlayerScore = computeScore(values, values1, values2)
                         Log.d("Test", "value 3: $values2")
 
+
                         val playerOne = DeckModel(values, "Score $PlayerScore")
                         val playerTwo = DeckModel(values1, "")
                         val playerThree = DeckModel(values2, "")
@@ -160,6 +168,23 @@ class MainActivity : AppCompatActivity() {
                         playerOneFirstBet1 = mutableListOf(
                             playerOne, playerTwo, playerThree, playerFour, playerFive, playerSix
                         )
+
+                        if(PlayerScore >21){
+
+
+                            //refresh activity
+                            finish()
+                            Toast(this).apply {
+                                setGravity(Gravity.FILL_HORIZONTAL ,10,10)
+                                duration= Toast.LENGTH_LONG
+                                view = layout_custom
+                            }.show()
+                            overridePendingTransition(0,0)
+                            startActivity(intent)
+                            overridePendingTransition(0,0)
+                             //this.recreate()
+
+                        }
                     }
 
 
@@ -214,6 +239,8 @@ class MainActivity : AppCompatActivity() {
                 parent_rv.adapter?.notifyDataSetChanged()
                 isClicked++
             }
+
+
 
         }
 
